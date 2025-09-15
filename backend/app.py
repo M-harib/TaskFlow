@@ -1,3 +1,4 @@
+import os
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
@@ -7,11 +8,11 @@ from flask_jwt_extended import JWTManager, create_access_token, jwt_required, ge
 
 app = Flask(__name__)
 
-app.config['JWT_SECRET_KEY'] = 'your-secret-key'  # Change this to a strong secret!
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///taskflow.db'
+app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'dev-secret-key')  # Change this to a strong secret!
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///taskflow.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-CORS(app, resources={r"/*": {"origins": "*"}})
+CORS(app, resources={r"/*": {"origins": os.getenv('FRONTEND_URL', '*')}})
 
 db = SQLAlchemy(app)
 jwt = JWTManager(app)
@@ -179,4 +180,7 @@ def login():
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-    app.run(debug=True)
+
+    port = int(os.environ.get('PORT', 5000))
+    debug = os.environ.get('FLASK_DEBUG', '0') == 1
+    app.run(host='0.0.0.0', port=port, debug=debug)
