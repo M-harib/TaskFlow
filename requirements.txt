@@ -15,6 +15,7 @@ cryptography==45.0.7
 cssselect2==0.8.0
 distro==1.9.0
 filelock==3.18.0
+Flask-Cors==3.1.1
 Flask==2.3.3
 Flask-JWT-Extended==4.7.1
 Flask-Migrate==4.1.0
