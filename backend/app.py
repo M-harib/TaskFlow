@@ -6,6 +6,7 @@ from datetime import datetime
 import bcrypt
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from your_app import db, app
+from backend import db, app
 
 with app.app_context():
     db.create_all()
