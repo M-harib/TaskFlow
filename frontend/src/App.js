@@ -48,7 +48,7 @@ function LoginForm({ onLogin, switchToSignup }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch('${API_URL}/login', {
+      const res = await fetch(`${API_URL}/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
@@ -82,7 +82,7 @@ function SignupForm({ switchToLogin }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch('${API_URL}/signup', {
+      const res = await fetch(`${API_URL}/signup`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
@@ -159,7 +159,7 @@ function App() {
   const fetchTasks = async () => {
     if (!token) return;
     try {
-      const res = await fetch('${API_URL}/tasks', {
+      const res = await fetch(`${API_URL}/tasks`, {
         headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
       });
       if (res.status === 401) return logout();
@@ -193,7 +193,7 @@ function App() {
     e.preventDefault();
     if (!title.trim()) return;
     try {
-      const res = await fetch('${API_URL}/tasks', {
+      const res = await fetch(`${API_URL}/tasks`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ title: title.trim(), description: description.trim(), deadline, priority }),
