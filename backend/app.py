@@ -17,9 +17,10 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # CORS: allow local dev and deployed frontend domain if provided
 frontend_url = os.getenv('FRONTEND_URL')  # set this in Render to your Vercel URL
 cors_origins = ["http://localhost:3000"]
+cors_origins.append("https://taskflow-nu-two.vercel.app")
 if frontend_url:
     cors_origins.append(frontend_url)
-CORS(app, resources={r"/*": {"origins": cors_origins}})
+CORS(app, resources={r"/*": {"origins": cors_origins}}, supports_credentials=True)
 
 db = SQLAlchemy(app)
 jwt = JWTManager(app)
