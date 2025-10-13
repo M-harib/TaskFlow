@@ -48,7 +48,7 @@ function LoginForm({ onLogin, switchToSignup }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch('http://127.0.0.1:5000/login', {
+      const res = await fetch('https://taskflow-l4m8.onrender.com/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
@@ -82,7 +82,7 @@ function SignupForm({ switchToLogin }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch('http://127.0.0.1:5000/signup', {
+      const res = await fetch('https://taskflow-l4m8.onrender.com/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
@@ -159,7 +159,7 @@ function App() {
   const fetchTasks = async () => {
     if (!token) return;
     try {
-      const res = await fetch('http://127.0.0.1:5000/tasks', {
+      const res = await fetch('https://taskflow-l4m8.onrender.com/tasks', {
         headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
       });
       if (res.status === 401) return logout();
@@ -193,7 +193,7 @@ function App() {
     e.preventDefault();
     if (!title.trim()) return;
     try {
-      const res = await fetch('http://127.0.0.1:5000/tasks', {
+      const res = await fetch('https://taskflow-l4m8.onrender.com/tasks', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ title: title.trim(), description: description.trim(), deadline, priority }),
@@ -216,7 +216,7 @@ function App() {
 
   const saveEdit = async (taskId) => {
     try {
-      const res = await fetch(`http://127.0.0.1:5000/tasks/${taskId}`, {
+      const res = await fetch(`https://taskflow-l4m8.onrender.com/tasks/${taskId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ title: editTitle, description: editDescription, deadline: editDeadline, priority: editPriority }),
@@ -231,7 +231,7 @@ function App() {
 
   const completeTask = async (task) => {
     try {
-      const res = await fetch(`http://127.0.0.1:5000/tasks/${task.id}`, {
+      const res = await fetch(`https://taskflow-l4m8.onrender.com/tasks/${task.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ status: 'completed' }),
@@ -245,7 +245,7 @@ function App() {
 
   const deleteTask = async (taskId) => {
     try {
-      const res = await fetch(`http://127.0.0.1:5000/tasks/${taskId}`, {
+      const res = await fetch(`https://taskflow-l4m8.onrender.com/tasks/${taskId}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
