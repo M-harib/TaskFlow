@@ -12,7 +12,11 @@ app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'dev-secret-key')  # 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///taskflow.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-CORS(app, resources={r"/*": {"origins": os.getenv('REACT_APP_API_URL', '*')}})
+# Allow your frontend domain explicitly
+CORS(app, resources={r"/*": {"origins": [
+    "http://localhost:3000",                 # for local dev
+    "https://taskflow-ouxblmdhe-m-haribs-projects.vercel.app"  # replace with your Vercel frontend URL
+]}}, supports_credentials=True)
 
 db = SQLAlchemy(app)
 jwt = JWTManager(app)
