@@ -50,19 +50,30 @@ function LoginForm({ onLogin, switchToSignup }) {
   
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("Login button pressed. API_URL=", API_URL);
+    console.log("Credentials:", { username, password: password ? '***' : '' });
+
     try {
       const res = await fetch(`${API_URL}/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
       });
-      const data = await res.json();
-      if (data.access_token) onLogin(data.access_token, username);
-      else alert(data.message || 'Login failed');
-    } catch {
-      alert('Login failed');
+      console.log('Fetch returned status', res.status);
+      let data;
+      try { data = await res.json(); } catch (err) { data = { _raw: await res.text() }; }
+      console.log('Fetch response body:', data);
+      if (res.ok && data.access_token) {
+        onLogin(data.access_token, username);
+      } else {
+        alert(data.message || `Login failed (status ${res.status})`);
+      }
+    } catch (err) {
+      console.error('Network/fetch error during login:', err);
+      alert('Login failed — network error (see console)');
     }
   };
+
   return (
     <div className="min-h-screen flex-center">
       <div className="container">
