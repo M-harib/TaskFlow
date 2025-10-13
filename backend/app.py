@@ -9,6 +9,7 @@ from backend.app import db, app
 
 with app.app_context():
     db.create_all()
+    print("tables created!")
 
 
 app = Flask(__name__)
