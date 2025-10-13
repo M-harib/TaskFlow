@@ -11,6 +11,9 @@ import {
   Legend
 } from 'chart.js';
 
+const API_URL = process.env.REACT_APP_API_URL || 'https://taskflow-l4m8.onrender.com';
+console.log('API_URL used by frontend:', API_URL);
+
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 // ===== ERROR BOUNDARY =====
