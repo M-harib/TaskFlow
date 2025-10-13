@@ -12,7 +12,7 @@ app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'dev-secret-key')  # 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///taskflow.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-CORS(app, resources={r"/*": {"origins": os.getenv('FRONTEND_URL', '*')}})
+CORS(app, resources={r"/*": {"origins": os.getenv('REACT_APP_API_URL', '*')}})
 
 db = SQLAlchemy(app)
 jwt = JWTManager(app)
