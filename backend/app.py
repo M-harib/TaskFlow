@@ -14,13 +14,20 @@ app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'dev-secret-key')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///taskflow.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# CORS: allow local dev and deployed frontend domain if provided
-frontend_url = os.getenv('FRONTEND_URL')  # set this in Render to your Vercel URL
+frontend_url = os.getenv('FRONTEND_URL', 'https://taskflow-nu-two.vercel.app')  # set this in Render
 cors_origins = ["http://localhost:3000"]
-cors_origins.append("https://taskflow-nu-two.vercel.app")
 if frontend_url:
     cors_origins.append(frontend_url)
-CORS(app, resources={r"/*": {"origins": cors_origins}}, supports_credentials=True)
+
+CORS(
+    app,
+    resources={r"/*": {
+        "origins": cors_origins,
+        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization", "Accept"]
+    }},
+    supports_credentials=True
+)
 
 db = SQLAlchemy(app)
 jwt = JWTManager(app)
