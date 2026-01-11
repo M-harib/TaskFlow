@@ -49,13 +49,18 @@ CORS(
 db = SQLAlchemy(app)
 jwt = JWTManager(app)
 
-# Initialize database tables on startup (for Render/production)
-with app.app_context():
-    try:
-        db.create_all()
-        print("Database tables initialized successfully")
-    except Exception as e:
-        print(f"Database initialization warning: {e}")
+# DB initialization moved to first request to avoid build-time failures
+_db_initialized = False
+
+def init_db():
+    global _db_initialized
+    if not _db_initialized:
+        try:
+            db.create_all()
+            print("Database tables initialized successfully")
+            _db_initialized = True
+        except Exception as e:
+            print(f"Database initialization warning: {e}")
 
 # ---------------- MODELS ----------------
 class User(db.Model):
@@ -86,6 +91,7 @@ class Task(db.Model):
 # ---------------- ROUTES ----------------
 @app.route('/')
 def home():
+    init_db()  # Initialize DB on first request
     return "TaskFlow API is running!"
 
 # Simple DB health check
