@@ -19,17 +19,20 @@ if database_url.startswith('postgres://'):
 app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-frontend_url = os.getenv('FRONTEND_URL', 'https://taskflow-nu-two.vercel.app')  # set this in Render
-cors_origins = ["http://localhost:3000"]
-if frontend_url:
-    cors_origins.append(frontend_url)
+frontend_url = os.getenv('FRONTEND_URL', 'https://taskflow-nu-two.vercel.app')
+cors_origins = [
+    "http://localhost:3000",
+    "https://taskflow-nu-two.vercel.app",
+    "https://taskflow-l4m8.onrender.com"
+]
 
 CORS(
     app,
     resources={r"/*": {
         "origins": cors_origins,
         "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-        "allow_headers": ["Content-Type", "Authorization", "Accept"]
+        "allow_headers": ["Content-Type", "Authorization", "Accept"],
+        "expose_headers": ["Content-Type", "Authorization"]
     }},
     supports_credentials=True
 )
@@ -67,6 +70,14 @@ class Task(db.Model):
 @app.route('/')
 def home():
     return "TaskFlow API is running!"
+
+
+# Handle preflight requests
+@app.before_request
+def handle_preflight():
+    if request.method == "OPTIONS":
+        response = app.make_default_options_response()
+        return response
 
 
 # TASKS
