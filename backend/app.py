@@ -14,7 +14,11 @@ app = Flask(__name__)
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'dev-secret-key')
 
 # Handle DATABASE_URL from Render (postgres:// -> postgresql://)
-database_url = os.getenv('DATABASE_URL', 'sqlite:///taskflow.db')
+# Fallback to provided PostgreSQL URL if env not set, to avoid SQLite in production
+database_url = os.getenv(
+    'DATABASE_URL',
+    'postgresql://taskflow:WLqqmsHqldYWacodeBMbUiRXrdho0Tw8@dpg-d5i1ipmr433s73c2nn00-a/taskflow_wl33'
+)
 if database_url.startswith('postgres://'):
     database_url = database_url.replace('postgres://', 'postgresql://', 1)
 app.config['SQLALCHEMY_DATABASE_URI'] = database_url
