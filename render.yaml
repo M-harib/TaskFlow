@@ -12,9 +12,7 @@ services:
       - key: FRONTEND_URL
         value: https://taskflow-nu-two.vercel.app
       - key: DATABASE_URL
-        fromDatabase:
-          name: taskflow-db
-          property: connectionString
+        value: postgresql://taskflow:WLqqmsHqldYWacodeBMbUiRXrdho0Tw8@dpg-d5i1ipmr433s73c2nn00-a/taskflow_wl33
 
 databases:
   - name: taskflow-db
