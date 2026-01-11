@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>TaskFlow API Test</title>
+</head>
+<body>
+    <h1>TaskFlow API Connection Test</h1>
+    <button onclick="testConnection()">Test Root Endpoint</button>
+    <button onclick="testLogin()">Test Login (will fail - for CORS test)</button>
+    <pre id="output"></pre>
+
+    <script>
+        const API_URL = 'https://taskflow-l4m8.onrender.com';
+        const output = document.getElementById('output');
+
+        async function testConnection() {
+            output.textContent = 'Testing root endpoint...\n';
+            try {
+                const res = await fetch(`${API_URL}/`);
+                const text = await res.text();
+                output.textContent += `✅ Success: ${text}\nStatus: ${res.status}\n`;
+            } catch (err) {
+                output.textContent += `❌ Error: ${err.message}\n`;
+            }
+        }
+
+        async function testLogin() {
+            output.textContent = 'Testing login endpoint...\n';
+            try {
+                const res = await fetch(`${API_URL}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: 'test', password: 'test' })
+                });
+                const data = await res.json();
+                output.textContent += `Status: ${res.status}\nResponse: ${JSON.stringify(data, null, 2)}\n`;
+            } catch (err) {
+                output.textContent += `❌ Error: ${err.message}\n`;
+            }
+        }
+    </script>
+</body>
+</html>
