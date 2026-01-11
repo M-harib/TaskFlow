@@ -21,6 +21,9 @@ database_url = os.getenv(
 )
 if database_url.startswith('postgres://'):
     database_url = database_url.replace('postgres://', 'postgresql://', 1)
+# If misconfigured to SQLite in env, override to PostgreSQL to prevent 500s in production
+if database_url.startswith('sqlite:'):
+    database_url = 'postgresql://taskflow:WLqqmsHqldYWacodeBMbUiRXrdho0Tw8@dpg-d5i1ipmr433s73c2nn00-a/taskflow_wl33'
 app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 print(f"[TaskFlow] SQLALCHEMY_DATABASE_URI in use: {app.config['SQLALCHEMY_DATABASE_URI']}")
