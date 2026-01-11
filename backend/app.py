@@ -41,14 +41,13 @@ CORS(
 db = SQLAlchemy(app)
 jwt = JWTManager(app)
 
-# Ensure tables exist in production (gunicorn) on first request
-@app.before_first_request
-def init_db():
+# Initialize database tables on startup (for Render/production)
+with app.app_context():
     try:
         db.create_all()
+        print("Database tables initialized successfully")
     except Exception as e:
-        # Log and continue; prevents startup crash
-        print("DB init error:", e)
+        print(f"Database initialization warning: {e}")
 
 # ---------------- MODELS ----------------
 class User(db.Model):
