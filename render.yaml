@@ -8,7 +8,7 @@ services:
       - key: PYTHON_VERSION
         value: 3.11.9
       - key: JWT_SECRET_KEY
-        generateValue: true
+        value: harib
       - key: FRONTEND_URL
         value: https://taskflow-nu-two.vercel.app
       - key: DATABASE_URL
