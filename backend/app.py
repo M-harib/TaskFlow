@@ -6,6 +6,7 @@ from flask_cors import CORS
 from datetime import datetime
 import bcrypt
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
+from sqlalchemy import text
 
 # ----- App setup -----
 app = Flask(__name__)
@@ -80,6 +81,14 @@ class Task(db.Model):
 def home():
     return "TaskFlow API is running!"
 
+# Simple DB health check
+@app.route('/health')
+def health():
+    try:
+        db.session.execute(text('SELECT 1'))
+        return jsonify({"status": "ok"}), 200
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
 
 # Handle preflight requests
 @app.before_request
