@@ -11,7 +11,12 @@ from flask_jwt_extended import JWTManager, create_access_token, jwt_required, ge
 app = Flask(__name__)
 
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'dev-secret-key')
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///taskflow.db')
+
+# Handle DATABASE_URL from Render (postgres:// -> postgresql://)
+database_url = os.getenv('DATABASE_URL', 'sqlite:///taskflow.db')
+if database_url.startswith('postgres://'):
+    database_url = database_url.replace('postgres://', 'postgresql://', 1)
+app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 frontend_url = os.getenv('FRONTEND_URL', 'https://taskflow-nu-two.vercel.app')  # set this in Render
