@@ -103,6 +103,26 @@ def health():
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 
+# Diagnostic endpoint to check database configuration
+@app.route('/debug/config')
+def debug_config():
+    db_uri = app.config.get('SQLALCHEMY_DATABASE_URI', 'NOT SET')
+    # Mask password for security
+    if '@' in db_uri:
+        parts = db_uri.split('@')
+        if ':' in parts[0]:
+            user_pass = parts[0].split(':')
+            masked = f"{user_pass[0].split('//')[0]}//{user_pass[0].split('//')[1]}:****@{parts[1]}"
+        else:
+            masked = db_uri
+    else:
+        masked = db_uri
+    return jsonify({
+        "database_uri": masked,
+        "is_postgresql": db_uri.startswith('postgresql://'),
+        "is_sqlite": db_uri.startswith('sqlite:')
+    }), 200
+
 # Handle preflight requests
 @app.before_request
 def handle_preflight():
