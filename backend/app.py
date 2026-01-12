@@ -14,19 +14,24 @@ app = Flask(__name__)
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'dev-secret-key')
 
 # Handle DATABASE_URL from Render (postgres:// -> postgresql://)
-# Fallback to provided PostgreSQL URL if env not set, to avoid SQLite in production
-database_url = os.getenv(
-    'DATABASE_URL',
-    'postgresql://taskflow:WLqqmsHqldYWacodeBMbUiRXrdho0Tw8@dpg-d5i1ipmr433s73c2nn00-a/taskflow_wl33'
-)
-if database_url.startswith('postgres://'):
-    database_url = database_url.replace('postgres://', 'postgresql://', 1)
-# If misconfigured to SQLite in env, override to PostgreSQL to prevent 500s in production
-if database_url.startswith('sqlite:'):
+# Get from environment or use hardcoded PostgreSQL
+raw_database_url = os.getenv('DATABASE_URL')
+print(f"[TaskFlow] Raw DATABASE_URL from env: {raw_database_url}")
+
+# Default to PostgreSQL if not set or if set to SQLite
+if not raw_database_url or raw_database_url.startswith('sqlite:'):
     database_url = 'postgresql://taskflow:WLqqmsHqldYWacodeBMbUiRXrdho0Tw8@dpg-d5i1ipmr433s73c2nn00-a/taskflow_wl33'
+    print(f"[TaskFlow] Overriding to PostgreSQL")
+else:
+    database_url = raw_database_url
+    # Handle postgres:// vs postgresql:// prefix
+    if database_url.startswith('postgres://'):
+        database_url = database_url.replace('postgres://', 'postgresql://', 1)
+        print(f"[TaskFlow] Converted postgres:// to postgresql://")
+
 app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-print(f"[TaskFlow] SQLALCHEMY_DATABASE_URI in use: {app.config['SQLALCHEMY_DATABASE_URI']}")
+print(f"[TaskFlow] Final SQLALCHEMY_DATABASE_URI: {database_url[:50]}...")
 
 frontend_url = os.getenv('FRONTEND_URL', 'https://taskflow-nu-two.vercel.app')
 cors_origins = [
