@@ -1,5 +1,6 @@
 # backend/app.py
 import os
+from urllib.parse import urlparse, urlunparse, parse_qsl, urlencode
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
@@ -13,25 +14,24 @@ app = Flask(__name__)
 
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'dev-secret-key')
 
-# Handle DATABASE_URL from Render (postgres:// -> postgresql://)
-# Get from environment or use hardcoded PostgreSQL
-raw_database_url = os.getenv('DATABASE_URL')
-print(f"[TaskFlow] Raw DATABASE_URL from env: {raw_database_url}")
+# Handle DATABASE_URL from Render/Neon.
+database_url = os.getenv('DATABASE_URL', 'sqlite:///taskflow.db')
 
-# Default to PostgreSQL if not set or if set to SQLite
-if not raw_database_url or raw_database_url.startswith('sqlite:'):
-    database_url = 'postgresql://taskflow:WLqqmsHqldYWacodeBMbUiRXrdho0Tw8@dpg-d5i1ipmr433s73c2nn00-a/taskflow_wl33'
-    print(f"[TaskFlow] Overriding to PostgreSQL")
-else:
-    database_url = raw_database_url
-    # Handle postgres:// vs postgresql:// prefix
-    if database_url.startswith('postgres://'):
-        database_url = database_url.replace('postgres://', 'postgresql://', 1)
-        print(f"[TaskFlow] Converted postgres:// to postgresql://")
+# Normalize legacy postgres scheme.
+if database_url.startswith('postgres://'):
+    database_url = database_url.replace('postgres://', 'postgresql://', 1)
+
+# Neon/Postgres requires TLS. Ensure sslmode=require if missing.
+if database_url.startswith('postgresql://'):
+    parsed = urlparse(database_url)
+    query = dict(parse_qsl(parsed.query))
+    query.setdefault('sslmode', 'require')
+    parsed = parsed._replace(query=urlencode(query))
+    database_url = urlunparse(parsed)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-print(f"[TaskFlow] Final SQLALCHEMY_DATABASE_URI: {database_url[:50]}...")
+print(f"[TaskFlow] DB driver: {'postgresql' if database_url.startswith('postgresql://') else 'sqlite'}")
 
 frontend_url = os.getenv('FRONTEND_URL', 'https://taskflow-nu-two.vercel.app')
 cors_origins = [
