@@ -47,6 +47,24 @@ body.dark .container {
   background-color: rgba(30,30,30,0.95);
 }
 
+/* Full-page layout for logged-in dashboard */
+.container.app-layout {
+  width: calc(100vw - 64px);
+  max-width: 1400px;
+  min-height: calc(100vh - 80px);
+  margin: 24px auto;
+  padding: 28px 28px 36px;
+}
+
+@media (max-width: 900px) {
+  .container.app-layout {
+    width: calc(100vw - 24px);
+    margin: 12px auto;
+    min-height: calc(100vh - 24px);
+    padding: 18px 14px 22px;
+  }
+}
+
 /* ===== Header ===== */
 .header {
   text-align: center;
@@ -356,6 +374,12 @@ body.dark .task-card { background-color: #2a2a2a; }
 .task-columns-container {
   display: flex;
   gap: 20px;
+}
+
+@media (max-width: 980px) {
+  .task-columns-container {
+    flex-direction: column;
+  }
 }
 
 .task-column {

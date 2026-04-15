@@ -292,7 +292,7 @@ function App() {
 
   return (
     <ErrorBoundary>
-      <div className="container">
+      <div className="container app-layout">
         <div className="top-header">
           <div className="username-display">
             <div style={{ fontSize: '1.3rem', fontWeight: 700 }}>TaskFlow - Hello {username}</div>
