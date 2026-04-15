@@ -14,8 +14,8 @@ app = Flask(__name__)
 
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'dev-secret-key')
 
-# Handle DATABASE_URL from Render/Neon.
-database_url = os.getenv('DATABASE_URL', 'sqlite:///taskflow.db')
+# Prefer dedicated Neon URL so platform-injected DATABASE_URL cannot override it.
+database_url = os.getenv('NEON_DATABASE_URL') or os.getenv('DATABASE_URL', 'sqlite:///taskflow.db')
 
 # Normalize legacy postgres scheme.
 if database_url.startswith('postgres://'):
@@ -32,6 +32,7 @@ if database_url.startswith('postgresql://'):
 app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 print(f"[TaskFlow] DB driver: {'postgresql' if database_url.startswith('postgresql://') else 'sqlite'}")
+print(f"[TaskFlow] DB source: {'NEON_DATABASE_URL' if os.getenv('NEON_DATABASE_URL') else 'DATABASE_URL'}")
 
 frontend_url = os.getenv('FRONTEND_URL', 'https://taskflow-nu-two.vercel.app')
 cors_origins = [
@@ -112,18 +113,15 @@ def health():
 @app.route('/debug/config')
 def debug_config():
     db_uri = app.config.get('SQLALCHEMY_DATABASE_URI', 'NOT SET')
-    # Mask password for security
-    if '@' in db_uri:
-        parts = db_uri.split('@')
-        if ':' in parts[0]:
-            user_pass = parts[0].split(':')
-            masked = f"{user_pass[0].split('//')[0]}//{user_pass[0].split('//')[1]}:****@{parts[1]}"
-        else:
-            masked = db_uri
+    parsed = urlparse(db_uri) if db_uri.startswith('postgresql://') else None
+    if parsed and parsed.hostname:
+        masked = f"{parsed.scheme}://{parsed.username or 'user'}:****@{parsed.hostname}{':' + str(parsed.port) if parsed.port else ''}{parsed.path}"
     else:
         masked = db_uri
     return jsonify({
         "database_uri": masked,
+        "database_host": parsed.hostname if parsed else None,
+        "database_source": "NEON_DATABASE_URL" if os.getenv('NEON_DATABASE_URL') else "DATABASE_URL",
         "is_postgresql": db_uri.startswith('postgresql://'),
         "is_sqlite": db_uri.startswith('sqlite:')
     }), 200
